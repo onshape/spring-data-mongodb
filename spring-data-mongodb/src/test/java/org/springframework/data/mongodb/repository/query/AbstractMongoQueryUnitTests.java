@@ -15,10 +15,15 @@
  */
 package org.springframework.data.mongodb.repository.query;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -63,7 +68,7 @@ import com.mongodb.WriteResult;
 
 /**
  * Unit tests for {@link AbstractMongoQuery}.
- * 
+ *
  * @author Christoph Strobl
  * @author Oliver Gierke
  * @author Thomas Darimont
@@ -249,8 +254,8 @@ public class AbstractMongoQueryUnitTests {
 
 		verify(mongoOperationsMock, times(2)).find(captor.capture(), eq(Person.class), eq("persons"));
 
-		assertThat(captor.getAllValues().get(0).getLimit(), is(11));
-		assertThat(captor.getAllValues().get(1).getLimit(), is(11));
+        assertThat(captor.getAllValues().get(0).getLimit(), is(10));
+        assertThat(captor.getAllValues().get(1).getLimit(), is(10));
 	}
 
 	/**

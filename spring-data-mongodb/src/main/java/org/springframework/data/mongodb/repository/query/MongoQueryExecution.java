@@ -92,15 +92,10 @@ interface MongoQueryExecution {
 		@SuppressWarnings({ "unchecked", "rawtypes" })
 		public Object execute(Query query, Class<?> type, String collection) {
 
-			int pageSize = pageable.getPageSize();
+			List result = operations.find(query.with(pageable), type, collection);
 
-			// Apply Pageable but tweak limit to peek into next page
-			Query modifiedQuery = query.with(pageable).limit(pageSize + 1);
-			List result = operations.find(modifiedQuery, type, collection);
-
-			boolean hasNext = result.size() > pageSize;
-
-			return new SliceImpl<Object>(hasNext ? result.subList(0, pageSize) : result, pageable, hasNext);
+            // If the caller asked for X pageSize and the results size is X, assume that there is another page
+            return new SliceImpl<Object>(result, pageable, result.size() == pageable.getPageSize());
 		}
 	}
 
