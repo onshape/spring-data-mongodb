@@ -103,7 +103,7 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	 */
 	@Override
 	public List<T> findAll(Predicate predicate) {
-		return createQueryFor(predicate).fetchResults().getResults();
+		return createQueryFor(predicate).fetch();
 	}
 
 	/*
@@ -112,7 +112,7 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	 */
 	@Override
 	public List<T> findAll(Predicate predicate, OrderSpecifier<?>... orders) {
-		return createQueryFor(predicate).orderBy(orders).fetchResults().getResults();
+		return createQueryFor(predicate).orderBy(orders).fetch();
 	}
 
 	/*
@@ -121,7 +121,7 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	 */
 	@Override
 	public List<T> findAll(Predicate predicate, Sort sort) {
-		return applySorting(createQueryFor(predicate), sort).fetchResults().getResults();
+		return applySorting(createQueryFor(predicate), sort).fetch();
 	}
 
 	/* 
@@ -130,7 +130,7 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	 */
 	@Override
 	public Iterable<T> findAll(OrderSpecifier<?>... orders) {
-		return createQuery().orderBy(orders).fetchResults().getResults();
+		return createQuery().orderBy(orders).fetch();
 	}
 
 	/*
@@ -141,14 +141,9 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	public Page<T> findAll(Predicate predicate, Pageable pageable) {
 
 		AbstractMongodbQuery<T, SpringDataMongodbQuery<T>> query = createQueryFor(predicate);
-        List<T> list = new ArrayList<T>();
 
-        // Use iterator() instead of list() method so that DBCursor#size() call is avoided. Otherwise, we pay the penalty
-        // for a count call (additional mongodb query call)
-        Iterator<T> iterator = applyPagination(query, pageable).fetchResults().getResults().iterator();
-        while (iterator.hasNext()) {
-            list.add(iterator.next());
-        }
+        // Use fetch() instead of fetchResults().getResults(). It makes additional count() call
+        List<T> list = applyPagination(query, pageable).fetch();
 
         int size = list.size();
         int pageSize = pageable.getPageSize();
@@ -170,14 +165,9 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	public Page<T> findAll(Pageable pageable) {
 
 		AbstractMongodbQuery<T, SpringDataMongodbQuery<T>> query = createQuery();
-        List<T> list = new ArrayList<T>();
 
-        // Use iterator() instead of list() method so that DBCursor#size() call is avoided. Otherwise, we pay the penalty
-        // for a count call (additional mongodb query call)
-        Iterator<T> iterator = applyPagination(query, pageable).fetchResults().getResults().iterator();
-        while (iterator.hasNext()) {
-                list.add(iterator.next());
-        }
+        // Use fetch() instead of fetchResults().getResults(). It makes additional count() call
+        List<T> list = applyPagination(query, pageable).fetch();
 
         int size = list.size();
         int pageSize = pageable.getPageSize();
@@ -197,7 +187,7 @@ public class QueryDslMongoRepository<T, ID extends Serializable> extends SimpleM
 	 */
 	@Override
 	public List<T> findAll(Sort sort) {
-		return applySorting(createQuery(), sort).fetchResults().getResults();
+		return applySorting(createQuery(), sort).fetch();
 	}
 
 	/*
